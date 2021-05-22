@@ -1,0 +1,38 @@
+version: "3"
+services: 
+  go:
+    container_name: gopra-go
+    depends_on:
+    - postgres
+    build: 
+      context: ./docker/golang
+      dockerfile: DockerFile
+      target: development
+    volumes: 
+      - ./app:/usr/local/go/src/go_basic_web_app
+    ports:
+      - 8888:8081
+    tty:
+      true
+    networks:
+      - go_basic_app-network
+  postgres:
+    image: postgres:13.3-alpine
+    container_name: gopra-postgres
+    ports:
+      - 5555:5432
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password 
+      - POSTGRES_DB=testdb
+    tty: true
+    restart: always
+    user: root
+    volumes:
+      - ./pgdb:/docker-entrypoint-initdb.d
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - go_basic_app-network
+networks:
+    go_basic_app-network:
+        driver: bridge
